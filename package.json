@@ -1,7 +1,6 @@
 {
   "name": "yt-dlp-api-server",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "dev": "node api/server.js",
     "build": "curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /tmp/yt-dlp && chmod +x /tmp/yt-dlp",
