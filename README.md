@@ -2,11 +2,6 @@
 
 ⚠️ **Disclaimer**: This project is for educational purposes only. Respect copyright laws and platform Terms of Service.
 
-## Deployment
-
-1. Fork this repository
-2. Deploy to Vercel: [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-3. Use the API endpoints
 
 ## API Endpoints
 
