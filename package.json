@@ -1,0 +1,23 @@
+{
+  "name": "yt-dlp-api-server",
+  "version": "1.0.0",
+  "description": "YouTube DL API Server for educational purposes",
+  "main": "api/server.js",
+  "scripts": {
+    "start": "node api/server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "GPLV3",
+  "keywords": ["youtube", "download", "api", "educational"],
+  "repository": {
+    "type": "git",
+    "url": "your-repo-url"
+  }
+}
