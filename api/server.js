@@ -8,8 +8,8 @@ class YTDLPServer {
   constructor() {
     this.app = express();
     this.port = process.env.PORT || 3000;
-    // Gunakan /tmp untuk writable directory di Vercel
     this.downloadDir = '/tmp/downloads';
+    this.ytDlpPath = '/tmp/yt-dlp'; // ⬅️ PATH YANG SAMA DENGAN BUILD SCRIPT
     
     this.setupMiddleware();
     this.setupRoutes();
@@ -49,7 +49,6 @@ class YTDLPServer {
           return res.status(400).json({ error: 'URL parameter is required' });
         }
 
-        // Validasi URL
         if (!this.isValidUrl(videoUrl)) {
           return res.status(400).json({ error: 'Invalid URL' });
         }
@@ -181,7 +180,8 @@ class YTDLPServer {
 
   getVideoInfo(videoUrl) {
     return new Promise((resolve, reject) => {
-      const command = `yt-dlp --dump-json --no-download "${videoUrl}"`;
+      // ⬇️ GUNAKAN this.ytDlpPath
+      const command = `"${this.ytDlpPath}" --dump-json --no-download "${videoUrl}"`;
       
       console.log('Executing:', command);
       
@@ -221,16 +221,18 @@ class YTDLPServer {
       
       let command;
       if (format === 'mp3') {
-        command = `yt-dlp -x --audio-format mp3 --audio-quality ${quality} -o "${outputTemplate}" "${videoUrl}"`;
+        // ⬇️ GUNAKAN this.ytDlpPath
+        command = `"${this.ytDlpPath}" -x --audio-format mp3 --audio-quality ${quality} -o "${outputTemplate}" "${videoUrl}"`;
       } else {
-        command = `yt-dlp -x --audio-format ${format} -o "${outputTemplate}" "${videoUrl}"`;
+        command = `"${this.ytDlpPath}" -x --audio-format ${format} -o "${outputTemplate}" "${videoUrl}"`;
       }
 
       console.log('Executing:', command);
       
       exec(command, (error, stdout, stderr) => {
         if (error) {
-          reject(new Error(`Download failed: ${error.message}`));
+          console.error('Download error details:', { error, stderr });
+          reject(new Error(`Download failed: ${stderr || error.message}`));
           return;
         }
 
@@ -252,6 +254,7 @@ class YTDLPServer {
             quality: quality
           });
         } else {
+          console.error('Available files:', files);
           reject(new Error('Downloaded file not found'));
         }
       });
@@ -265,16 +268,18 @@ class YTDLPServer {
       
       let command;
       if (quality === 'best') {
-        command = `yt-dlp -f "best[ext=${format}]" -o "${outputTemplate}" "${videoUrl}"`;
+        // ⬇️ GUNAKAN this.ytDlpPath
+        command = `"${this.ytDlpPath}" -f "best[ext=${format}]" -o "${outputTemplate}" "${videoUrl}"`;
       } else {
-        command = `yt-dlp -f "best[height<=${quality}]" -o "${outputTemplate}" "${videoUrl}"`;
+        command = `"${this.ytDlpPath}" -f "best[height<=${quality}]" -o "${outputTemplate}" "${videoUrl}"`;
       }
 
       console.log('Executing:', command);
       
       exec(command, (error, stdout, stderr) => {
         if (error) {
-          reject(new Error(`Download failed: ${error.message}`));
+          console.error('Download error details:', { error, stderr });
+          reject(new Error(`Download failed: ${stderr || error.message}`));
           return;
         }
 
@@ -296,6 +301,7 @@ class YTDLPServer {
             quality: quality
           });
         } else {
+          console.error('Available files:', files);
           reject(new Error('Downloaded file not found'));
         }
       });
@@ -307,6 +313,7 @@ class YTDLPServer {
       console.log('🎵 YT-DLP API Server Started!');
       console.log(`📍 Port: ${this.port}`);
       console.log(`📁 Download Directory: ${path.resolve(this.downloadDir)}`);
+      console.log(`🔧 yt-dlp Path: ${this.ytDlpPath}`);
       console.log('\n🌐 Available Endpoints:');
       console.log('   GET  /api/info?url=YOUTUBE_URL');
       console.log('   GET  /api/download/mp3?url=YOUTUBE_URL');
